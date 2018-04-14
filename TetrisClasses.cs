@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Tetris_v2
 {
     public class GameBoard
@@ -77,48 +77,75 @@ namespace Tetris_v2
             }
         }
 
+        //public void ClearLines()
+        //{
+            
+        //}
+
+        //public bool IsGameOver()
+        //{
+            
+        //}
+
+        //public bool IsLineFull()
+        //{
+            
+        //}
+
+
         // constructeur
         public GameBoard()
         {
         }
     }
 
-    public class Tetromino
+    public class Tetromino : GameBoard
     {
         // attributs
-        public int[,] shape;
+
         public int[] TopLeft;
         public int[] potentialTopLeft;
-        public int[][,] rotations;
+        public int[][][] rotations;
         public ConsoleColor colour;
         public int indicator = 0;
-        public int[][] landed;
+        public int potentialIndicator = 0;
+        public bool land;
 
         // méthodes
+
         public void Show()
         {
             Console.ForegroundColor = this.colour;
             Console.SetCursorPosition(this.TopLeft[0], this.TopLeft[1]);
 
-            for (int i = 0; i <= this.rotations[this.indicator].GetUpperBound(0); i++)
+            for (int i = 0; i < this.rotations[this.indicator].Length; i++)
             {
-                for (int j = 0; j <= this.rotations[this.indicator].GetUpperBound(1); j++)
+                for (int j = 0; j < this.rotations[this.indicator][i].Length; j++)
                 {
-                    Console.SetCursorPosition(this.TopLeft[0] + i, this.TopLeft[1] + j);
-                    Console.WriteLine(this.rotations[this.indicator][i, j]);
-                }
+                    Console.SetCursorPosition(this.TopLeft[0] + j + 6, this.TopLeft[1] + i + 5);
 
+                    if (this.rotations[this.indicator][i][j] == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine(this.rotations[this.indicator][i][j]);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = this.colour;
+                        Console.WriteLine(this.rotations[this.indicator][i][j]);
+                    }
+                }
             }
         }
 
         public void Clear()
         {
             Console.ForegroundColor = ConsoleColor.White;
-            for (int i = 0; i <= this.rotations[this.indicator].GetUpperBound(0); i++)
+            for (int i = 0; i < this.rotations[this.indicator].Length; i++)
             {
-                for (int j = 0; j <= this.rotations[this.indicator].GetUpperBound(1); j++)
+                for (int j = 0; j < this.rotations[this.indicator][i].Length; j++)
                 {
-                    Console.SetCursorPosition(this.TopLeft[0] + i, this.TopLeft[1] + j);
+                    Console.SetCursorPosition(this.TopLeft[0] + 6 + j, this.TopLeft[1] + 5 + i);
                     Console.WriteLine(0);
                 }
             }
@@ -126,26 +153,35 @@ namespace Tetris_v2
 
         public bool CanIShow()
         {
+
             bool show = true;
 
-            for (int i = 0; i <= this.rotations[this.indicator].GetUpperBound(0); i++) // boucle sur les colonnes
+            int line;
+            int col;
+            int val;
+
+            for (int i = 0; i < this.rotations[this.potentialIndicator].Length; i++)
             {
-                for (int j = 0; j <= this.rotations[this.indicator].GetUpperBound(1); j++) // boucle sur les lignes
+                for (int j = 0; j < this.rotations[this.potentialIndicator][i].Length; j++)
                 {
-                    int impact = 0;
+                    line = this.potentialTopLeft[1] + i;
+                    col = this.potentialTopLeft[0] + j;
                     try
                     {
-                        impact = this.landed[this.potentialTopLeft[0] + j][this.potentialTopLeft[1] + i];    // cas où on ne sort pas de la grille
+						val = this.landed[line][col];
                     }
-                    catch(IndexOutOfRangeException)
+                    catch (IndexOutOfRangeException)
                     {
-                        impact = 1; // cas où on sort de la grille
+                        // cas où l'on sort de la grille
+                        val = 1;
                     }
 
-
-                    if ((this.rotations[this.indicator][i,j] == 1) && (impact == 1))
+                    if (val == 1)
                     {
-                        show = false;
+                        if (this.rotations[this.potentialIndicator][i][j] == 1)
+                        {
+                            show = false;
+                        }
                     }
                 }
             }
@@ -153,6 +189,29 @@ namespace Tetris_v2
             return show;
         }
 
+        public void DidILand()
+        {
+
+            // récupérer l'indice de la dernière lignée de notre tetromino affiché
+            int n = this.rotations[this.indicator].Length - 1;
+
+            // vérifier si on est à la dernière ligne
+            if (this.TopLeft[1] == 40)
+            {
+                this.land = true;
+                return;
+            }
+            // vérifier s'il y a eut impact
+            for (int i = 0; i < this.rotations[this.indicator][n].Length; i++)
+            {
+                if (this.rotations[this.indicator][n][i] == 1 && this.landed[this.TopLeft[1] + n][i] == 1)
+                {
+                    this.land = true;       
+                }
+            }
+
+            return;
+        }
 
         public void GetInput()
         {
@@ -163,21 +222,25 @@ namespace Tetris_v2
                 // afficher la rotation si possible
                 if (this.indicator + 1 < this.rotations.Length)
                 {
-                    this.indicator = this.indicator + 1;
-                    this.potentialTopLeft = this.TopLeft;
+                    this.potentialTopLeft[0] = this.TopLeft[0];
+                    this.potentialTopLeft[1] = this.TopLeft[1];
+                    this.potentialIndicator = this.indicator + 1;
                     if (this.CanIShow())
                     {
                         this.Clear();
+						this.indicator = this.potentialIndicator;
                         this.Show();
                     }
                 }
                 else
                 {
-                    this.indicator = 0;
-                    this.potentialTopLeft = this.TopLeft;
+                    this.potentialTopLeft[0] = this.TopLeft[0];
+                    this.potentialTopLeft[1] = this.TopLeft[1];
+                    this.potentialIndicator = 0;
                     if (this.CanIShow())
                     {
-						this.Clear();
+                        this.Clear();
+						this.indicator = this.potentialIndicator;
                         this.Show();
                     }
                 }
@@ -185,51 +248,72 @@ namespace Tetris_v2
             if (input == ConsoleKey.RightArrow)
             {  
                 // afficher le tetromino à la colonne de droite si possible
-                if (this.TopLeft[0] + 1 < 75)
+                if (this.TopLeft[0] + 1 < 69)
                 {
                     this.potentialTopLeft[0] = this.TopLeft[0] + 1;
+                    this.potentialIndicator = this.indicator;
                     if (this.CanIShow())
                     {
                         this.Clear();
-                        this.TopLeft = this.potentialTopLeft;
+                        this.TopLeft[0] = this.potentialTopLeft[0];
                         this.Show();
+                    }
+                    else
+                    {
+                        this.potentialTopLeft[0] = this.TopLeft[0];
                     }
                 }
             }
             if (input == ConsoleKey.LeftArrow)
             {
                 // afficher le tetromino à la colonne de gauche si possible
-                if (this.TopLeft[0] - 1 > 5)
+                if (this.TopLeft[0] > 0)
                 {
                     this.potentialTopLeft[0] = this.TopLeft[0] - 1;
+                    this.potentialIndicator = this.indicator;
                     if (this.CanIShow())
                     {
                         this.Clear();
-                        this.TopLeft = this.potentialTopLeft;
+                        this.TopLeft[0] = this.potentialTopLeft[0];
                         this.Show();
+                    }
+                    else
+                    {
+                        this.potentialTopLeft[0] = this.TopLeft[0];
                     }
                 }
             }
             if (input == ConsoleKey.DownArrow)
             {
                 // accélerer la descente
-                if (this.TopLeft[1] + 1 < 45)
+                if (this.TopLeft[1] + 1 < 40)
                 {
-                    this.potentialTopLeft[1] = this.TopLeft[1] + 1;
-                    if (this.CanIShow()) 
+                    // vérifier si on est arrivé en bas
+                    this.DidILand();
+                    if (!this.land)
                     {
-						this.Clear();
-                        this.TopLeft = this.potentialTopLeft;
-                        this.Show();
+                        this.potentialTopLeft[1] = this.TopLeft[1] + 1;
+                        this.potentialIndicator = this.indicator;
+                        if (this.CanIShow())
+                        {
+                            this.Clear();
+                            this.TopLeft[1] = this.potentialTopLeft[1];
+                            this.Show();
+                        }
+                        else
+                        {
+                            this.potentialTopLeft[1] = this.TopLeft[1];
+                        }    
                     }
+
                 }
             }
         }
 
         // constructeurs
-        public Tetromino()
+        public Tetromino(GameBoard gb)
         {
-                    
+            this.landed = gb.landed;
         }
     }
 }
