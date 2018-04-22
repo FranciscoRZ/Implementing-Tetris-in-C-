@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+
 namespace Tetris_v2
 {
     public class GameBoard
@@ -87,25 +89,40 @@ namespace Tetris_v2
             {
                 for (int j = 0; j < T.rotations[T.indicator][i].Length; j++)
                 {
-                    this.landed[T.TopLeft[1] + i][T.TopLeft[0] + j] = T.rotations[T.indicator][i][j];
+                    if (this.landed[T.TopLeft[1] + i][T.TopLeft[0] + j] != 1)
+                    {
+                        this.landed[T.TopLeft[1] + i][T.TopLeft[0] + j] = T.rotations[T.indicator][i][j];    
+                    }
                 }
             }
         }
 
         //public void ClearLines()
-        //{
-            
-        //}
 
-        //public bool IsGameOver()
-        //{
-            
-        //}
+        public bool IsLineFull(int line)
+        {
+            bool full = false;
 
-        //public bool IsLineFull()
-        //{
-            
-        //}
+            int val = landed[line].Sum();
+            if (val == landed[line].Length)
+            {
+                full = true;    
+            }
+
+            return full;
+        }
+
+        public bool IsGameOver()
+        {
+            bool Over = false;
+
+            if (IsLineFull(0))
+            {
+                Over = true;
+            }
+
+            return Over;
+        }
 
 
         // constructeur
@@ -206,31 +223,28 @@ namespace Tetris_v2
 
         public void DidILand(GameBoard gb)
         {
-
-            // récupérer l'indice de la dernière lignée de notre tetromino affiché
-            int n = this.rotations[this.indicator].Length - 1;
-
             // vérifier si on est à la dernière ligne
-            if (this.TopLeft[1] + this.rotations[this.indicator].Length == 40)
+            if (this.TopLeft[1] + this.rotations[this.indicator].Length == this.landed.Length)
             {
                 this.land = true;
                 return;
             }
             // vérifier s'il y a eut impact
-            for (int i = 0; i < this.rotations[this.indicator][n].Length; i++)
+            for (int i = 0; i < this.rotations[this.indicator].Length; i++)
             {
-                if (this.rotations[this.indicator][n][i] == 1 && gb.landed[this.TopLeft[1] + n][i] == 1)
+                for (int j = 0; j < this.rotations[this.indicator][i].Length; j++)
                 {
-                    this.land = true;       
+                    if (this.rotations[this.indicator][i][j] == 1 && gb.landed[this.TopLeft[1] + i + 1][this.TopLeft[0] + j] == 1)
+                    {
+                        this.land = true;
+                    }
                 }
             }
-
-            return;
         }
 
-        public void GetInput(GameBoard gb)
+        public void GetInput(GameBoard gb, ConsoleKey input)
         {
-            ConsoleKey input = Console.ReadKey().Key;
+            //ConsoleKey input = Console.ReadKey().Key;
 
             if (input == ConsoleKey.Spacebar)
             {
@@ -300,7 +314,7 @@ namespace Tetris_v2
             }
             if (input == ConsoleKey.DownArrow)
             {
-                // accélerer la descente
+                // descendre
                 if (this.TopLeft[1] + 1 < 40)
                 {
                     // vérifier si on est arrivé en bas
@@ -324,6 +338,33 @@ namespace Tetris_v2
                 }
             }
         }
+
+        public void Initialize(GameBoard gb)
+        {
+            // initialiser la position où il va apparaître
+            Random choose = new Random();
+            int Col = choose.Next(0, 69);
+
+            this.TopLeft = new int[2] { Col, 0 };
+            this.potentialTopLeft = new int[2] { Col, 0 };
+            this.land = false;
+
+            this.DidILand(gb);
+
+            while (this.land) 
+            {
+                Col = choose.Next(0, 69);
+                this.TopLeft[0] = Col;
+                this.potentialTopLeft[0] = Col;
+                this.DidILand(gb);
+            }
+
+            // initialiser la rotation
+            this.indicator = 0;
+            this.potentialIndicator = 0;
+
+        }
+
 
         // constructeurs
         public Tetromino(GameBoard gb)
