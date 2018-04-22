@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Tetris_v2
 {
@@ -16,6 +17,8 @@ namespace Tetris_v2
 
             // Initialisation des tetrominos
 
+            Dictionary<int, Tetromino> GamePieces = new Dictionary<int, Tetromino>();
+
             // ------ I -------
             Tetromino I = new Tetromino(gb);
 
@@ -32,6 +35,7 @@ namespace Tetris_v2
 
             I.colour = ConsoleColor.Cyan;
 
+            GamePieces.Add(1, I);
 
             // ------ J -------
             Tetromino J = new Tetromino(gb);
@@ -58,6 +62,8 @@ namespace Tetris_v2
 
             J.colour = ConsoleColor.Blue;
 
+            GamePieces.Add(2, J);
+
             // ------ L -------
             Tetromino L = new Tetromino(gb);
 
@@ -83,6 +89,7 @@ namespace Tetris_v2
 
             L.colour = ConsoleColor.DarkYellow;
 
+            GamePieces.Add(3, L);
 
             // ------ O -------
             Tetromino O = new Tetromino(gb);
@@ -95,6 +102,7 @@ namespace Tetris_v2
 
             O.colour = ConsoleColor.Yellow;
 
+            GamePieces.Add(4, O);
 
             // ------ S -------
             Tetromino S = new Tetromino(gb);
@@ -112,6 +120,7 @@ namespace Tetris_v2
 
             S.colour = ConsoleColor.Green;
 
+            GamePieces.Add(5, S);
 
             // ------ T -------
             Tetromino T = new Tetromino(gb);
@@ -138,6 +147,7 @@ namespace Tetris_v2
 
             T.colour = ConsoleColor.Magenta;
 
+            GamePieces.Add(6, T);
 
             // ------- Z ------
             Tetromino Z = new Tetromino(gb);
@@ -155,6 +165,7 @@ namespace Tetris_v2
 
             Z.colour = ConsoleColor.Red;
 
+            GamePieces.Add(7, Z);
 
             // ------ Lancement du jeu ----------
 
@@ -163,10 +174,13 @@ namespace Tetris_v2
             T.potentialTopLeft[0] = T.TopLeft[0];
             T.potentialTopLeft[1] = T.TopLeft[1];
 
+            Random Choser = new Random();
+            int WhichPiece = Choser.Next(1, 8);
+
 
             while(true)
             {
-                T.GetInput();
+                T.GetInput(gb);
             }
 
         }
