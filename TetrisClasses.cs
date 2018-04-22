@@ -49,30 +49,45 @@ namespace Tetris_v2
         public int[][] FillLanded()
         {
             int[][] landed1 = new int[40][];
-            int[] arr = new int[69];
-
-            for (int j = 0; j < 69; j++)
-            {
-                arr[j] = 0;
-            }
-
             for (int i = 0; i < 40; i++)
             {
-                landed1[i] = arr;    
+                landed1[i] = new int[69];
+                for (int j = 0; j < 69; j++)
+                {
+                    landed1[i][j] = 0;
+                }
             }
             return landed1;
         }
 
         public void ShowLanded()
         {
-            Console.ForegroundColor = ConsoleColor.White;
-
             for (int i = 0; i < this.landed.Length; i++)
             {
-                for (int j = 0; j < this.landed[1].Length; j++)
+                for (int j = 0; j < this.landed[i].Length; j++)
                 {
                     Console.SetCursorPosition(6 + j, 5 + i);
-                    Console.WriteLine(this.landed[i][j]);
+                    if (this.landed[i][j] == 1) 
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        Console.WriteLine(this.landed[i][j]);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine(this.landed[i][j]);
+                    }
+                }
+            }
+        }
+
+        public void UpdateLanded(Tetromino T)
+        {
+            for (int i = 0; i < T.rotations[T.indicator].Length; i++)
+            {
+                for (int j = 0; j < T.rotations[T.indicator][i].Length; j++)
+                {
+                    this.landed[T.TopLeft[1] + i][T.TopLeft[0] + j] = T.rotations[T.indicator][i][j];
                 }
             }
         }
@@ -151,7 +166,7 @@ namespace Tetris_v2
             }
         }
 
-        public bool CanIShow()
+        public bool CanIShow(GameBoard gb)
         {
 
             bool show = true;
@@ -168,7 +183,7 @@ namespace Tetris_v2
                     col = this.potentialTopLeft[0] + j;
                     try
                     {
-						val = this.landed[line][col];
+						val = gb.landed[line][col];
                     }
                     catch (IndexOutOfRangeException)
                     {
@@ -189,14 +204,14 @@ namespace Tetris_v2
             return show;
         }
 
-        public void DidILand()
+        public void DidILand(GameBoard gb)
         {
 
             // récupérer l'indice de la dernière lignée de notre tetromino affiché
             int n = this.rotations[this.indicator].Length - 1;
 
             // vérifier si on est à la dernière ligne
-            if (this.TopLeft[1] == 40)
+            if (this.TopLeft[1] + this.rotations[this.indicator].Length == 40)
             {
                 this.land = true;
                 return;
@@ -204,7 +219,7 @@ namespace Tetris_v2
             // vérifier s'il y a eut impact
             for (int i = 0; i < this.rotations[this.indicator][n].Length; i++)
             {
-                if (this.rotations[this.indicator][n][i] == 1 && this.landed[this.TopLeft[1] + n][i] == 1)
+                if (this.rotations[this.indicator][n][i] == 1 && gb.landed[this.TopLeft[1] + n][i] == 1)
                 {
                     this.land = true;       
                 }
@@ -213,7 +228,7 @@ namespace Tetris_v2
             return;
         }
 
-        public void GetInput()
+        public void GetInput(GameBoard gb)
         {
             ConsoleKey input = Console.ReadKey().Key;
 
@@ -225,7 +240,7 @@ namespace Tetris_v2
                     this.potentialTopLeft[0] = this.TopLeft[0];
                     this.potentialTopLeft[1] = this.TopLeft[1];
                     this.potentialIndicator = this.indicator + 1;
-                    if (this.CanIShow())
+                    if (this.CanIShow(gb))
                     {
                         this.Clear();
 						this.indicator = this.potentialIndicator;
@@ -237,7 +252,7 @@ namespace Tetris_v2
                     this.potentialTopLeft[0] = this.TopLeft[0];
                     this.potentialTopLeft[1] = this.TopLeft[1];
                     this.potentialIndicator = 0;
-                    if (this.CanIShow())
+                    if (this.CanIShow(gb))
                     {
                         this.Clear();
 						this.indicator = this.potentialIndicator;
@@ -252,7 +267,7 @@ namespace Tetris_v2
                 {
                     this.potentialTopLeft[0] = this.TopLeft[0] + 1;
                     this.potentialIndicator = this.indicator;
-                    if (this.CanIShow())
+                    if (this.CanIShow(gb))
                     {
                         this.Clear();
                         this.TopLeft[0] = this.potentialTopLeft[0];
@@ -271,7 +286,7 @@ namespace Tetris_v2
                 {
                     this.potentialTopLeft[0] = this.TopLeft[0] - 1;
                     this.potentialIndicator = this.indicator;
-                    if (this.CanIShow())
+                    if (this.CanIShow(gb))
                     {
                         this.Clear();
                         this.TopLeft[0] = this.potentialTopLeft[0];
@@ -289,12 +304,12 @@ namespace Tetris_v2
                 if (this.TopLeft[1] + 1 < 40)
                 {
                     // vérifier si on est arrivé en bas
-                    this.DidILand();
+                    this.DidILand(gb);
                     if (!this.land)
                     {
                         this.potentialTopLeft[1] = this.TopLeft[1] + 1;
                         this.potentialIndicator = this.indicator;
-                        if (this.CanIShow())
+                        if (this.CanIShow(gb))
                         {
                             this.Clear();
                             this.TopLeft[1] = this.potentialTopLeft[1];
@@ -316,4 +331,13 @@ namespace Tetris_v2
             this.landed = gb.landed;
         }
     }
+
+    public class GameMaster : GameBoard
+    {
+        public void Choose()
+        {
+            
+        }
+    }
+
 }
