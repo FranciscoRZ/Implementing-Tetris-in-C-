@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Timers;
+using System.Diagnostics;
 
 namespace Tetris_v2
 {
@@ -156,7 +158,7 @@ namespace Tetris_v2
 
             Z.rotations[0] = new int[2][];
             Z.rotations[0][0] = new int[3] { 1, 1, 0 };
-            Z.rotations[0][1] = new int[3] { 1, 1, 1 };
+            Z.rotations[0][1] = new int[3] { 0, 1, 1 };
 
             Z.rotations[1] = new int[3][];
             Z.rotations[1][0] = new int[2] { 0, 1 };
@@ -174,13 +176,54 @@ namespace Tetris_v2
             T.potentialTopLeft[0] = T.TopLeft[0];
             T.potentialTopLeft[1] = T.TopLeft[1];
 
-            Random Choser = new Random();
-            int WhichPiece = Choser.Next(1, 8);
+            bool Over = false;
 
+            //TimeSpan down = TimeSpan.FromMilliseconds(500);
+            //DateTime start_time;
 
-            while(true)
+            Stopwatch goDown = new Stopwatch();
+
+            ConsoleKey input;
+
+            while(!Over)
             {
-                T.GetInput(gb);
+                // Choisir le tetromino
+                Random Choser = new Random();
+                int WhichPiece = Choser.Next(1, 8);
+
+                // Initialiser le tetromino choisi
+                GamePieces[WhichPiece].Initialize(gb);
+
+
+                // Jouer la pìece choisie
+                while (GamePieces[WhichPiece].land == false)
+                {
+                    // Input joueur
+                    goDown.Reset();
+                    goDown.Start();
+
+                    if (goDown.ElapsedMilliseconds > 500)
+                    {
+                        goDown.Stop();
+						input = ConsoleKey.DownArrow;
+                        GamePieces[WhichPiece].GetInput(gb, input);
+                    }
+                    else
+                    {
+                        input = Console.ReadKey().Key;
+                        GamePieces[WhichPiece].GetInput(gb, input);
+                    }
+
+                    // Jouer
+                    GamePieces[WhichPiece].DidILand(gb);
+                }
+
+                gb.UpdateLanded(GamePieces[WhichPiece]);
+                gb.ShowLanded();
+
+                // Vérifier si le jeu est fini
+				Over = gb.IsGameOver();
+				
             }
 
         }
