@@ -364,6 +364,25 @@ namespace TETRIS
                     }
                 }
             }
+
+            // vérifier si on est à la dernière ligne
+            if (this.TopLeft[1] + this.rotations[this.indicator].Length == this.landed.Length)
+            {
+                this.land = true;
+                return;
+            }
+            // vérifier s'il y a eut impact
+            for (int i = 0; i < this.rotations[this.indicator].Length; i++)
+            {
+                for (int j = 0; j < this.rotations[this.indicator][i].Length; j++)
+                {
+                    if (this.rotations[this.indicator][i][j] == 1 && gb.landed[this.TopLeft[1] + i + 1][this.TopLeft[0] + j] == 1)
+                    {
+                        this.land = true;
+                    }
+                }
+            }
+
         }
 
         public void Initialize(GameBoard gb)
