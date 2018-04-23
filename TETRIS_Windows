@@ -189,6 +189,16 @@ namespace TETRIS
 
             while (!Over)
             {
+            
+                // Vérifier si les lignes sont remplies
+                for (int line = gb.landed.Length - 1; line > 0; line--)
+                {
+                    if (gb.IsLineFull(line))
+                    {
+                        gb.ClearLine(line);
+                    }
+                }
+            
                 // Choisir le tetromino
                 Random Choser = new Random();
                 int WhichPiece = Choser.Next(1, 8);
