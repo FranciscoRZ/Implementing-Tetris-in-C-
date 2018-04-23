@@ -23,6 +23,9 @@ namespace TETRIS
             gb.score = 0;
             gb.level = 1;
             gb.ShowScore();
+            gb.ShowLevel();
+            gb.ShowRules();
+
             // Initialisation des tetrominos
 
             Dictionary<int, Tetromino> GamePieces = new Dictionary<int, Tetromino>();
@@ -206,7 +209,16 @@ namespace TETRIS
                     }
                 }
 
-            
+                // Actualiser le niveau si besoin
+                if (count == 2)
+                {
+                    gb.level = gb.level + 1;
+                    gb.ShowLevel();
+                    increment = increment * 1.5;
+                    dropRate = (int)Math.Floor(dropRate / 1.25);
+                    count = 0;
+                }
+
                 // Choisir le tetromino
                 Random Choser = new Random();
                 int WhichPiece = Choser.Next(1, 8);
