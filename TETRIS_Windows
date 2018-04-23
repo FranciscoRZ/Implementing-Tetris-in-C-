@@ -183,8 +183,9 @@ namespace TETRIS
             bool Over = false;
 
             Stopwatch tiktok = new Stopwatch();
-            //ConsoleKey input = ConsoleKey.DownArrow;
+            
             int dropRate = 500;
+
 
             while (!Over)
             {
@@ -195,6 +196,10 @@ namespace TETRIS
                 // Initialiser le tetromino choisi
                 GamePieces[WhichPiece].Initialize(gb);
 
+                // Lancer la descente
+                Thread DropTet = new Thread(() => DropIt(GamePieces[WhichPiece], gb, dropRate));
+                DropTet.Start();
+
                 // Jouer la pìece choisie
                 while (GamePieces[WhichPiece].land == false)
                 {
@@ -203,12 +208,23 @@ namespace TETRIS
                     GamePieces[WhichPiece].DidILand(gb);
                 }
 
+                DropTet.Abort();
+
                 gb.UpdateLanded(GamePieces[WhichPiece]);
                 gb.ShowLanded();
 
                 // Vérifier si le jeu est fini
                 Over = gb.IsGameOver();
 
+            }
+        }
+
+        static void DropIt(Tetromino T, GameBoard gb, int dropRate)
+        {
+            while (true)
+            {
+                Thread.Sleep(dropRate);
+                T.Drop(gb);
             }
         }
     }
