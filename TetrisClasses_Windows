@@ -18,7 +18,7 @@ namespace TETRIS
         // méthode construisant les bordures
         public void Build()
         {
-            Console.SetWindowSize(80, 44);
+            Console.SetWindowSize(95, 41);
 
             // écriture du titre du jeu
             Console.ForegroundColor = ConsoleColor.White;
@@ -91,8 +91,22 @@ namespace TETRIS
         {
             Console.SetCursorPosition(49, 6);
             Console.WriteLine("Score : " + this.score);
+        }
+
+        public void ShowLevel()
+        {
             Console.SetCursorPosition(49, 8);
             Console.WriteLine("Level : " + this.level);
+        }
+
+        public void ShowRules()
+        {
+            Console.SetCursorPosition(49, 10);
+            Console.WriteLine("Règles : \n");
+            Console.SetCursorPosition(49, 11);
+            Console.WriteLine("- Utilisez les flèches pour vous déplacer \n");
+            Console.SetCursorPosition(49, 12);
+            Console.WriteLine("- Tappez 'espace' pour une rotation \n");
         }
 
         public void UpdateLanded(Tetromino T)
