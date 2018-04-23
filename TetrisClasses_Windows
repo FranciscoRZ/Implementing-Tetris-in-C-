@@ -11,7 +11,8 @@ namespace TETRIS
         // attributs
         public int[][] landed;
         public int[][] grid;
-
+        public double score;
+        public int level;
         // méthodes
 
         // méthode construisant les bordures
@@ -84,6 +85,14 @@ namespace TETRIS
                     }
                 }
             }
+        }
+
+        public void ShowScore()
+        {
+            Console.SetCursorPosition(49, 6);
+            Console.WriteLine("Score : " + this.score);
+            Console.SetCursorPosition(49, 8);
+            Console.WriteLine("Level : " + this.level);
         }
 
         public void UpdateLanded(Tetromino T)
