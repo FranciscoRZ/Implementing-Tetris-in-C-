@@ -20,7 +20,9 @@ namespace TETRIS
             gb.Build();
             gb.landed = gb.FillLanded();
             gb.ShowLanded();
-
+            gb.score = 0;
+            gb.level = 1;
+            gb.ShowScore();
             // Initialisation des tetrominos
 
             Dictionary<int, Tetromino> GamePieces = new Dictionary<int, Tetromino>();
@@ -185,19 +187,25 @@ namespace TETRIS
             Stopwatch tiktok = new Stopwatch();
             
             int dropRate = 500;
-
+            int count = 0;
+            double increment = 50;
 
             while (!Over)
             {
             
-                // Vérifier si les lignes sont remplies
+                // Vérifier si certaines lignes sont remplies
                 for (int line = gb.landed.Length - 1; line > 0; line--)
                 {
                     if (gb.IsLineFull(line))
                     {
                         gb.ClearLine(line);
+                        gb.score = gb.score + increment;
+                        // afficher nouveau score
+                        gb.ShowScore();
+                        count = count + 1;
                     }
                 }
+
             
                 // Choisir le tetromino
                 Random Choser = new Random();
