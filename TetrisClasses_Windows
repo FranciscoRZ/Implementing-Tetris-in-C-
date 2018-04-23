@@ -100,7 +100,21 @@ namespace TETRIS
             }
         }
 
-        //public void ClearLines()
+        public void ClearLine(int line)
+        {
+            // pour chaque ligne à partir de la ligne qu'on veut supprimer, jusqu'à la première
+            for (int i = line; i > 0; i--)
+            {
+                // copier la ligne d'en haut et écraser celle d'en bas
+                for (int j = 0; j < this.landed[i - 1].Length; j++)
+                {
+                    this.landed[i][j] = this.landed[i - 1][j]; 
+                }
+            }
+
+            // montrer la nouvelle grille
+            this.ShowLanded();
+        }
 
         public bool IsLineFull(int line)
         {
